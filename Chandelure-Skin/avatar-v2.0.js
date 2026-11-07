@@ -1,6 +1,5 @@
 /* Avatar a fiammella nel menuwrap */
 (function(){
-  const NS = 'http://www.w3.org/2000/svg';
   // Fiammella / fuoco fatuo nel riquadro 0–100: lingua principale a sinistra, lingua piccola a destra.
   const FLAME = 'M50 97 C27 97 12 80 12 60 C12 42 24 30 34 20 C40 14 42 8 40 2 ' +
                 'C52 8 60 16 62 26 C64 20 66 16 70 13 C72 22 88 38 88 60 C88 80 73 97 50 97 Z';
@@ -8,8 +7,6 @@
   // (fondo → lato sinistro → punta → lato destro → fondo), così le lettere in alto stanno dritte.
   const TRACK = 'M50 97 C27 97 12 80 12 60 C12 42 24 30 34 20 C37 16 40 5 44 2 ' +
                 'C52 -4 88 30 88 60 C88 80 73 97 50 97';
-  // Stellina a quattro punte per le estremità della linea
-  const SPARK = 'M0 -3.2 L0.8 -0.8 L3.2 0 L0.8 0.8 L0 3.2 L-0.8 0.8 L-3.2 0 L-0.8 -0.8 Z';
 
   // Allarga un path (solo comandi assoluti M/L/C/Q) attorno a un centro e lo sposta.
   function scalePath(d, k, cx, cy, dx, dy){
@@ -60,7 +57,6 @@
       avatarEl.appendChild(frame);
 
       // Misure reali (servono a pagina disegnata: dipendono da font e nick)
-      const svg  = frame.querySelector('svg');
       const L    = frame.querySelector(`#${id}t`).getTotalLength();
       const text = frame.querySelector('text');
       const tp   = frame.querySelector('textPath');
@@ -78,17 +74,6 @@
       const a = Math.max(0, mid - T / 2 - o.gap);     // fine della linea, prima della scritta
       const b = Math.min(L, mid + T / 2 + o.gap);     // ripresa della linea, dopo la scritta
       frame.querySelector('.av-line').setAttribute('stroke-dasharray', `${a.toFixed(1)} ${(b - a).toFixed(1)} ${L.toFixed(1)}`);
-
-      // Stelline alle due estremità della linea
-      const trackEl = frame.querySelector(`#${id}t`);
-      [a, b].forEach(len => {
-        const p = trackEl.getPointAtLength(len);
-        const s = document.createElementNS(NS, 'path');
-        s.setAttribute('class', 'av-spark');
-        s.setAttribute('d', SPARK);
-        s.setAttribute('transform', `translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`);
-        svg.appendChild(s);
-      });
     };
     img.complete && img.naturalWidth ? render() : img.addEventListener('load', render, {once:true});
   };
