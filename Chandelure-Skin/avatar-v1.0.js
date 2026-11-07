@@ -1,3 +1,4 @@
+/* Avatar a fiammella nel menuwrap */
 (function(){
   const NS = 'http://www.w3.org/2000/svg';
   // Fiammella / fuoco fatuo nel riquadro 0–100: lingua principale a sinistra, lingua piccola a destra.
@@ -9,14 +10,14 @@
                 'C52 -4 88 30 88 60 C88 80 73 97 50 97';
   // Stellina a quattro punte per le estremità della linea
   const SPARK = 'M0 -3.2 L0.8 -0.8 L3.2 0 L0.8 0.8 L0 3.2 L-0.8 0.8 L-3.2 0 L-0.8 -0.8 Z';
- 
+
   // Allarga un path (solo comandi assoluti M/L/C/Q) attorno a un centro e lo sposta.
   function scalePath(d, k, cx, cy, dx, dy){
     return d.replace(/(-?\d*\.?\d+)\s+(-?\d*\.?\d+)/g, (_, x, y) =>
       `${(cx + (x - cx) * k + dx).toFixed(2)} ${(cy + (y - cy) * k + dy).toFixed(2)}`);
   }
   const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
- 
+
   let uid = 0;
   window.buildFlameAvatar = function(avatarEl, opts){
     const o = Object.assign({
@@ -32,14 +33,14 @@
     const nick = (o.nick || (document.querySelector('.menuwrap .nick') || {}).textContent || '').trim();
     const label = o.text.replace('{nick}', nick).replace(/\s*•\s*$/, '');
     const id = 'avf' + (++uid);
- 
+
     const render = () => {
       // Mai più grande dell'immagine reale: è questo che evita lo sgranato.
       const nat  = Math.min(img.naturalWidth || o.size, img.naturalHeight || o.size);
       const size = Math.min(o.size, nat);
       const shape = scalePath(FLAME, 1, 50, 58, 22, 22);
       const track = scalePath(TRACK, 1.2, 50, 58, 22, 22);
- 
+
       const frame = document.createElement('span');
       frame.className = 'av-frame';
       frame.style.setProperty('--av-size', size + 'px');
@@ -57,7 +58,7 @@
          </svg>`;
       avatarEl.classList.add('av-shaped');
       avatarEl.appendChild(frame);
- 
+
       // Misure reali (servono a pagina disegnata: dipendono da font e nick)
       const svg  = frame.querySelector('svg');
       const L    = frame.querySelector(`#${id}t`).getTotalLength();
@@ -71,13 +72,13 @@
       }
       const mid = L * o.anchor;
       tp.setAttribute('startOffset', mid.toFixed(1));
- 
+
       // Linea su tutto il resto del contorno: dal fondo fino a prima della scritta,
       // poi da dopo la scritta fino al fondo (il punto d'inizio del percorso).
       const a = Math.max(0, mid - T / 2 - o.gap);     // fine della linea, prima della scritta
       const b = Math.min(L, mid + T / 2 + o.gap);     // ripresa della linea, dopo la scritta
       frame.querySelector('.av-line').setAttribute('stroke-dasharray', `${a.toFixed(1)} ${(b - a).toFixed(1)} ${L.toFixed(1)}`);
- 
+
       // Stelline alle due estremità della linea
       const trackEl = frame.querySelector(`#${id}t`);
       [a, b].forEach(len => {
@@ -91,10 +92,12 @@
     };
     img.complete && img.naturalWidth ? render() : img.addEventListener('load', render, {once:true});
   };
- 
-  // Uso nella skin (menuwrap ForumFree/BlogFree):
-  // document.addEventListener('DOMContentLoaded', () => {
-  //   const av = document.querySelector('.menuwrap .avatar');
-  //   if(av) buildFlameAvatar(av, {size:120});
-  // });
+
+  // Avvio nella skin. ForumFree può caricare lo script DOPO DOMContentLoaded:
+  // in quel caso un semplice addEventListener non scatterebbe mai, quindi controlliamo readyState.
+  const start = () => {
+    const av = document.querySelector('.menuwrap .avatar');
+    if(av) buildFlameAvatar(av, {size:120});
+  };
+  document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', start) : start();
 })();
