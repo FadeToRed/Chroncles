@@ -1,5 +1,5 @@
-/* Tendine del menu laterale sempre dentro lo schermo
-   Quando una tendina di .menuwrap > .left si apre (al passaggio del mouse), lo script
+/* Tendine del menu laterale sempre dentro lo schermo (anche le sottotendine)
+   Quando una tendina di .menuwrap .left si apre (al passaggio del mouse), lo script
    misura dove finisce: se va oltre il fondo dello schermo la alza quanto basta;
    se è più alta dello schermo intero, la limita in altezza e la rende scorrevole. */
 (function(){
@@ -31,7 +31,9 @@
   }
 
   function avvia(){
-    document.querySelectorAll('.menuwrap > .left > li').forEach(li => {
+    // tutte le voci del menu laterale che hanno una tendina: quelle principali
+    // e quelle dentro le tendine (.left .menu ul ul, la "tendina della tendina")
+    document.querySelectorAll('.menuwrap .left li').forEach(li => {
       const ul = li.querySelector(':scope > ul');
       if(!ul) return;
       // al mouseenter il :hover è già attivo, quindi la tendina è visibile e misurabile
