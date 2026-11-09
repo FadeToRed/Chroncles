@@ -18,6 +18,7 @@
     items.forEach((li, n) => { li.classList.toggle('tl-active', n === 0); track.appendChild(li); });
     slot.appendChild(track);
     if(items.length < 2) return slot;
+    slot.classList.add('tl-multi');
 
     let i = 0, timer = null;
     const nav = document.createElement('div');
