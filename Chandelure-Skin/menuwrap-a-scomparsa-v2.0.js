@@ -1,4 +1,3 @@
-<script>
 /* Menu a scomparsa: sotto i 1000px il menu laterale si nasconde
    e si apre/chiude con il pulsante in alto a sinistra.
    Si chiude anche cliccando fuori o premendo Esc. */
@@ -48,4 +47,3 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();
-</script>
