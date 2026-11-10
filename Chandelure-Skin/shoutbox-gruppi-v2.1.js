@@ -1,12 +1,13 @@
 /* Shoutbox: colore del gruppo su bordo dell'avatar e nickname.
    Il gruppo di chi scrive si chiede a ForumFree tramite /api.php?mid=ID1,ID2,...
    (risponde a tutti, anche agli ospiti, e dice il gruppo di ogni utente).
+   Gli utenti semplici hanno gruppo 0: per loro la classe è "utente", come nelle statistiche.
    Le risposte vengono ricordate nel browser per qualche ora, così non si rifà la
    richiesta a ogni pagina. Lo script mette la classe gruppoN sul messaggio;
    il colore lo decide il CSS (le stesse regole dei gruppi delle statistiche).
    Su GitHub/jsDelivr va così com'è; se lo incolli direttamente in ForumFree, mettilo tra <script> e </script>. */
 (function () {
-  var CHIAVE = 'wl-gruppi-v2';
+  var CHIAVE = 'wl-gruppi-v3'; // cambiata: le voci salvate dalla v2 non avevano gli utenti semplici
   var DURATA = 6 * 60 * 60 * 1000; // dopo 6 ore il gruppo salvato si ricontrolla
   var cache = {};        // id -> { g: numero gruppo, t: quando è stato letto }
   var inCorso = {};      // id già chiesti e in attesa di risposta
@@ -23,13 +24,14 @@
   }
 
   function metti(msg, g) {
+    var giusta = g > 0 ? 'gruppo' + g : 'utente';
     var cls = msg.className.split(' ');
     var nuova = [];
     for (var i = 0; i < cls.length; i++) {
       // tolgo un eventuale gruppo vecchio (utente spostato di gruppo)
-      if (!/^gruppo\d+$/.test(cls[i]) || cls[i] === 'gruppo' + g) nuova.push(cls[i]);
+      if (!/^(gruppo\d+|utente)$/.test(cls[i]) || cls[i] === giusta) nuova.push(cls[i]);
     }
-    if (nuova.indexOf('gruppo' + g) < 0) nuova.push('gruppo' + g);
+    if (nuova.indexOf(giusta) < 0) nuova.push(giusta);
     var s = nuova.join(' ');
     if (s !== msg.className) msg.className = s;
   }
@@ -38,7 +40,7 @@
     var msg = messaggi();
     for (var i = 0; i < msg.length; i++) {
       var c = cache[msg[i].getAttribute('data-uid')];
-      if (c) metti(msg[i], c.g);
+      if (c && c.g !== null) metti(msg[i], c.g);
     }
   }
 
@@ -68,7 +70,9 @@
         var adesso = Date.now();
         for (var i = 0; i < ids.length; i++) {
           var u = dati['m' + ids[i]];
-          if (u && u.group && u.group.id) cache[ids[i]] = { g: u.group.id, t: adesso };
+          // anche il gruppo 0 (utente semplice) e gli utenti non trovati vanno ricordati,
+          // altrimenti verrebbero richiesti di nuovo a ogni nuovo messaggio
+          cache[ids[i]] = { g: (u && u.group) ? Number(u.group.id) || 0 : null, t: adesso };
         }
         salva();
         colora();
