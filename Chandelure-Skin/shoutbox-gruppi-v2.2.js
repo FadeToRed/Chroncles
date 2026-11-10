@@ -1,9 +1,9 @@
-/* Shoutbox: colore del gruppo su bordo dell'avatar e nickname.
+/* Shoutbox e tagboard: colore del gruppo su bordo dell'avatar e nickname.
    Il gruppo di chi scrive si chiede a ForumFree tramite /api.php?mid=ID1,ID2,...
    (risponde a tutti, anche agli ospiti, e dice il gruppo di ogni utente).
    Gli utenti semplici hanno gruppo 0: per loro la classe è "utente", come nelle statistiche.
    Le risposte vengono ricordate nel browser per qualche ora, così non si rifà la
-   richiesta a ogni pagina. Lo script mette la classe gruppoN sul messaggio;
+   richiesta a ogni pagina. Lo script mette sul messaggio le classi "wl-gr" e gruppoN (o "utente");
    il colore lo decide il CSS (le stesse regole dei gruppi delle statistiche).
    Su GitHub/jsDelivr va così com'è; se lo incolli direttamente in ForumFree, mettilo tra <script> e </script>. */
 (function () {
@@ -19,8 +19,18 @@
     try { localStorage.setItem(CHIAVE, JSON.stringify(cache)); } catch (e) {}
   }
 
+  // shoutbox: l'id è in data-uid; tagboard: è nella classe userN del nick
   function messaggi() {
-    return document.querySelectorAll('.hb-message[data-uid]');
+    var out = [];
+    var hb = document.querySelectorAll('.hb-message[data-uid]');
+    for (var i = 0; i < hb.length; i++) out.push({ el: hb[i], id: hb[i].getAttribute('data-uid') });
+    var tag = document.querySelectorAll('#tagObject > li');
+    for (var j = 0; j < tag.length; j++) {
+      var n = tag[j].querySelector('a.nickname');
+      var m = n && n.className.match(/\buser(\d+)\b/);
+      if (m) out.push({ el: tag[j], id: m[1] });
+    }
+    return out;
   }
 
   function metti(msg, g) {
@@ -32,6 +42,7 @@
       if (!/^(gruppo\d+|utente)$/.test(cls[i]) || cls[i] === giusta) nuova.push(cls[i]);
     }
     if (nuova.indexOf(giusta) < 0) nuova.push(giusta);
+    if (nuova.indexOf('wl-gr') < 0) nuova.push('wl-gr');
     var s = nuova.join(' ');
     if (s !== msg.className) msg.className = s;
   }
@@ -39,8 +50,8 @@
   function colora() {
     var msg = messaggi();
     for (var i = 0; i < msg.length; i++) {
-      var c = cache[msg[i].getAttribute('data-uid')];
-      if (c && c.g !== null) metti(msg[i], c.g);
+      var c = cache[msg[i].id];
+      if (c && c.g !== null) metti(msg[i].el, c.g);
     }
   }
 
@@ -49,7 +60,7 @@
     var adesso = Date.now();
     var ids = [];
     for (var i = 0; i < msg.length; i++) {
-      var id = msg[i].getAttribute('data-uid');
+      var id = msg[i].id;
       if (!id || id === '0' || inCorso[id] || ids.indexOf(id) >= 0) continue;
       var c = cache[id];
       if (!c || adesso - c.t > DURATA) ids.push(id);
