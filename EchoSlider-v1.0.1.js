@@ -7,7 +7,7 @@
  * @requires SkyFramework (va caricato prima di questo script)
  * @requires window.ECHO_CONFIG
  *
- * @version 3.0.0
+ * @version 3.1.0
  */
 
 ;(function () {
@@ -137,9 +137,21 @@
       + '</div>';
   }
 
+  /**
+   * Selettore dell'elemento prima del quale va messo lo slider.
+   * posizionamento può essere una stringa (uguale ovunque) oppure
+   * { home: '...', altrove: '...' } per usare un punto diverso in homepage.
+   */
+  function selettore() {
+    const p = config.posizionamento;
+    if (typeof p === 'string') return p;
+    return Sky.location.isHome() ? (p.home || p.altrove) : (p.altrove || p.home);
+  }
+
   function creaSlider() {
-    const target = Sky.dom.one(config.posizionamento);
-    if (!target) { Sky.log.error(LOG, 'elemento target non trovato: ' + config.posizionamento); return false; }
+    const sel = selettore();
+    const target = sel ? Sky.dom.one(sel) : null;
+    if (!target) { Sky.log.error(LOG, 'elemento target non trovato: ' + sel); return false; }
     if (document.getElementById('echo-slider')) return false;
 
     slider = Sky.dom.create('div', {
