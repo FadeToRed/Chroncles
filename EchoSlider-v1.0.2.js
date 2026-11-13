@@ -7,7 +7,7 @@
  * @requires SkyFramework (va caricato prima di questo script)
  * @requires window.ECHO_CONFIG
  *
- * @version 3.1.0
+ * @version 3.1.1
  */
 
 ;(function () {
@@ -169,7 +169,10 @@
 
   function disegna() {
     const container = slider.querySelector('.echo-container');
-    container['inn' + 'erHTML'] = topics.length ? topics.map(htmlTopic).join('') : htmlVuoto();
+    // sempre numTopics slide: se i topic sono meno, il resto sono segnaposto
+    let html = '';
+    for (let i = 0; i < config.numTopics; i++) html += i < topics.length ? htmlTopic(topics[i]) : htmlVuoto();
+    container['inn' + 'erHTML'] = html;
   }
 
   // -----------------------------------------------
@@ -239,9 +242,9 @@
 
   function avvia() {
     disegna();
-    // il giro passa solo sui topic veri, non sui segnaposto
+    // il giro passa su tutte le slide, segnaposto compresi
     rotator = Sky.ui.rotator({
-      total:    Math.max(topics.length, 1),
+      total:    config.numTopics,
       interval: config.intervalloSlide,
       pauseOn:  slider,
       onChange: function (i) { mostra(i); }
