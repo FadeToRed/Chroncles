@@ -10,7 +10,7 @@
  * @requires window.TABELLA_HOME_CONFIG
  * @requires window.FORTUNE_TELLER_FRASI (solo per il Fortune Teller)
  *
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 ;(function () {
@@ -48,11 +48,12 @@
     const slide = c.slide || [];
     if (!box || !slide.length) return;
 
-    // il titolo è già nell'HTML: lo metto nell'intestazione, i pallini vanno sotto la slide
+    // il titolo è già nell'HTML: lo sposto nell'intestazione accanto ai pallini
     const titolo = box.querySelector('.titolo-slideshow');
     const hd = Sky.dom.create('div', { class: 'tbh-ss-hd' });
     if (titolo) hd.appendChild(titolo);
     const dots = Sky.dom.create('div', { class: 'tbh-ss-dots' });
+    hd.appendChild(dots);
 
     const vp = Sky.dom.create('div', { class: 'tbh-ss-vp' });
     const track = Sky.dom.create('div', { class: 'tbh-ss-track' });
@@ -69,7 +70,6 @@
     box['inn' + 'erHTML'] = '';
     box.appendChild(hd);
     box.appendChild(vp);
-    box.appendChild(dots);
 
     if (slide.length < 2) return;
 
@@ -134,11 +134,11 @@
         + regole + '</div>';
     }
 
-    // quante miniature mostrare: quelle che entrano intere ad almeno 40px di lato;
-    // poi si allargano tutte insieme fino a riempire la riga (il lato lo decide il CSS)
+    // quante miniature mostrare: ognuna occupa 45px (35 di immagine + il contorno),
+    // con almeno 8px fra l'una e l'altra; poi il CSS le distribuisce su tutta la riga
     function disegna() {
-      const MIN = 40, GAP = 6;
-      const quante = Math.max(1, Math.floor((strip.clientWidth + GAP) / (MIN + GAP)));
+      const POSTO = 45, GAP = 8;
+      const quante = Math.max(1, Math.floor((strip.clientWidth + GAP) / (POSTO + GAP)));
       strip['inn' + 'erHTML'] = '';
       elenco.slice(0, quante).forEach(function (r, i) {
         const a = Sky.dom.create('a', { class: 'tbh-ris-th' + (i === 0 ? ' tbh-on' : ''), href: r.link, 'aria-label': r.titolo },
