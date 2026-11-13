@@ -7,7 +7,7 @@
  * @requires SkyFramework (va caricato prima di questo script)
  * @requires window.ECHO_CONFIG
  *
- * @version 3.1.1
+ * @version 3.1.2
  */
 
 ;(function () {
@@ -164,6 +164,12 @@
         + '</div>'
     });
     target.parentNode.insertBefore(slider, target);
+
+    // Lo slider non deve allargare chi lo contiene: dentro una cella di tabella
+    // (es. .tabella-homepage) le slide larghe 100% farebbero crescere la tabella
+    // all'infinito. Con width 0 + min-width 100% prende la larghezza del contenitore
+    // senza imporla.
+    Sky.dom.injectCSS('echo-slider-base', 'body #echo-slider{width:0;min-width:100%;box-sizing:border-box}');
     return true;
   }
 
