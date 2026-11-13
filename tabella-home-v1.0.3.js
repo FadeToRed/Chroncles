@@ -10,7 +10,7 @@
  * @requires window.TABELLA_HOME_CONFIG
  * @requires window.FORTUNE_TELLER_FRASI (solo per il Fortune Teller)
  *
- * @version 1.0.1
+ * @version 1.0.2
  */
 
 ;(function () {
@@ -134,10 +134,10 @@
         + regole + '</div>';
     }
 
-    // quante miniature mostrare: ognuna occupa 45px (35 di immagine + il contorno),
-    // con almeno 8px fra l'una e l'altra; poi il CSS le distribuisce su tutta la riga
+    // quante miniature mostrare: ognuna occupa 49px (35 di immagine + padding e bordo),
+    // con almeno 5px fra l'una e l'altra; poi il CSS le distribuisce su tutta la riga
     function disegna() {
-      const POSTO = 45, GAP = 8;
+      const POSTO = 49, GAP = 5;
       const quante = Math.max(1, Math.floor((strip.clientWidth + GAP) / (POSTO + GAP)));
       strip['inn' + 'erHTML'] = '';
       elenco.slice(0, quante).forEach(function (r, i) {
